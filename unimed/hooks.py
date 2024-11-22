@@ -129,9 +129,9 @@ app_license = "mit"
 # ---------------
 # Override standard doctype classes
 
-# override_doctype_class = {
-# 	"ToDo": "custom_app.overrides.CustomToDo"
-# }
+override_doctype_class = {
+    "Report": "unimed.overrides.report.CustomReport",
+}
 
 # Document Events
 # ---------------
@@ -174,9 +174,9 @@ app_license = "mit"
 # Overriding Methods
 # ------------------------------
 #
-# override_whitelisted_methods = {
-# 	"frappe.desk.doctype.event.event.get_events": "unimed.event.get_events"
-# }
+override_whitelisted_methods = {
+    "frappe.desk.query_report.get_script": "unimed.overrides.report.get_script"
+}
 #
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
@@ -242,3 +242,14 @@ app_license = "mit"
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
 
+report_override_js = {
+    "General Ledger": "overrides_reports/js/custom_general_ledger.js",
+}
+
+# report_override = {
+# 	"General Ledger": "unimed.overrides_reports.custom_general_ledger.execute",
+# }
+
+report_override_html = {
+	"General Ledger": "overrides_reports/html/custom_general_ledger.html",
+}

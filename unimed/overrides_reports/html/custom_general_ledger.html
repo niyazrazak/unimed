@@ -1,0 +1,198 @@
+<style>
+	.print-format {
+		font-family: "Times New Roman", Times, serif !important;
+	}
+
+	.soa table {
+		width: 100%;
+		border-collapse: collapse;
+		border: 1px solid #ccc;
+	}
+
+	.soa th,
+	.soa td {
+		border: 1px solid #ccc;
+		padding: 8px;
+		text-align: center;
+	}
+
+	/* Apply alternate row colors */
+	.soa tr:nth-child(even) {
+		background-color: #f2f2f2;
+	}
+
+	/* Style the header */
+	.header-th {
+		background-color: #333;
+		color: #fff;
+	}
+
+	.bottom-border {
+		border-bottom: 1px solid black;
+	}
+
+	.header-th {
+		background-color: #004382 !important;
+		color: white !important;
+		font-weight: bolder !important;
+		text-align: center;
+		vertical-align: middle !important;
+	}
+
+	.bank tr,
+	.bank td {
+		border: 0px solid white !important;
+		padding: 0 !important;
+	}
+</style>
+<div class="row" id="header">
+	<!-- <img src="/assets/unimed/img/unimed_soa_header.png" style="width: 100%;"> -->
+	<div class="col-xs-7">
+		<div class="col-xs-8" style="margin: auto;">
+			<table class="table-sm table-condensed table-bordered" style="width: 100%;">
+				<tr>
+					<th style="background-color: #004382 !important; color: white !important;">Customer Details</th>
+				</tr>
+				<tr>
+					<td class="text=left">
+						<p style="font-size: 12px; font-weight: bold;">Customer: {%= report.party_details.party_name %}
+						</p>
+						<p style="font-size: 12px; font-weight: bold;">Tax ID: {%= report.party_details.party_tax_id %}
+						</p>
+						<p style="font-size: 12px; font-weight: bold;">Email: {%= report.party_details.party_email %}
+						</p>
+						<p style="font-size: 12px; font-weight: bold;">Phone: {%= report.party_details.party_phone %}
+						</p>
+						<p style="font-size: 12px; font-weight: bold;">Address: {%= report.party_details.party_address
+							%}</p>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+	<div class="col-xs-5" style="width:40%">
+		<div style="margin-top:0px;margin-left: 21%;">
+			<table class="table-sm table-condensed table-bordered" style="width: 100%;">
+				<tr>
+					<th style="background-color: #004382 !important; color: white !important;">Statement Date:</th>
+				</tr>
+				<tr>
+					<td>
+						<div class="text-left">
+							<p style="font-size: 12px;"></p><b>From Date:</b>
+							<span style="margin-left: 10px;">
+								{%= frappe.datetime.str_to_user(filters.from_date) %}
+							</span></p>
+						</div>
+						<div class="text-left">
+							<p style="font-size: 12px;"><b>To Date:</b>
+								<span style="margin-left: 20px;">
+									{%= frappe.datetime.str_to_user(filters.to_date) %}
+								</span>
+							</p>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</div>
+<small>
+	<table class="table table-sm table-condensed soa">
+		<thead>
+			<tr>
+				<th class="header-th" width="10%">Date</th>
+				<th class="header-th" width="25%">Invoice / Credit Note / PV</th>
+				<th class="header-th" width="25%">Description</th>
+				<th class="header-th" width="12%">Debit</th>
+				<th class="header-th" width="12%">Credit</th>
+				<th class="header-th" width="12%">Balance</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for(var i=0, l=data.length; i<l; i++) { %} <tr>
+				{% if(data[i].posting_date) { %}
+				<td>{%= frappe.datetime.str_to_user(data[i].posting_date) %}</td>
+				<td>{%= data[i].voucher_no %}</td>
+				<td>{%= data[i].remarks %}</td>
+				<td style="text-align: right">
+					{%= format_currency(data[i].debit, filters.presentation_currency) %}
+				</td>
+				<td style="text-align: right">
+					{%= format_currency(data[i].credit, filters.presentation_currency) %}
+				</td>
+				<td style="text-align: right">
+					{%= format_currency(data[i].balance, filters.presentation_currency || data[i].account_currency) %}
+				</td>
+				{% } else { %}
+				<td></td>
+				<td><b>{%= frappe.format(data[i].account, {fieldtype: "Link"}) || "&nbsp;" %}</b></td>
+				<td></td>
+				<td style="text-align: right">
+					{%= data[i].account && format_currency(data[i].debit, filters.presentation_currency ||
+					data[i].account_currency) %}
+				</td>
+				<td style="text-align: right">
+					{%= data[i].account && format_currency(data[i].credit, filters.presentation_currency ||
+					data[i].account_currency) %}
+				</td>
+				<td style="text-align: right">
+					{%= format_currency(data[i].balance, filters.presentation_currency || data[i].account_currency) %}
+				</td>
+				{% } %}
+				</tr>
+				{% } %}
+		</tbody>
+	</table>
+</small>
+<small>
+	<div class="row mx-2" id="footer">
+		<div class="col-xs-6">
+			<table class="bank" style="width:100%;" border="0">
+				<tr>
+					<th style="background-color: #004382 !important; color: white !important;" colspan="3">
+						ALL CHEQUES/WIRE TRANSFER ARE PAYABLE TO
+					</th>
+				</tr>
+				<tr>
+					<td width="30%">Account Name</td>
+					<td width="4%">:</td>
+					<td>{%= report.bank_details.account_name %}</td>
+				</tr>
+				<tr>
+					<td>Bank Name</td>
+					<td>:</td>
+					<td>{%= report.bank_details.bank %}</td>
+				</tr>
+				<tr>
+					<td>Branch</td>
+					<td>:</td>
+					<td>{%= report.bank_details.branch %}</td>
+				</tr>
+				<tr>
+					<td>Swfit Code</td>
+					<td>:</td>
+					<td>{%= report.bank_details.swift_number %}</td>
+				</tr>
+				<tr>
+					<td>IBAN</td>
+					<td>:</td>
+					<td> {%= report.bank_details.iban %}</td>
+				</tr>
+				<tr>
+					<td>Bank Acc No</td>
+					<td>:</td>
+					<td>{%= report.bank_details.bank_account_no %}</td>
+				</tr>
+			</table>
+		</div>
+		<div class="col-xs-6">
+			<div style="padding: 0;margin:0;" class="text-center my-2">
+				<p style="font-size: 12px; font-weight: bold;">
+					<br><br><br>
+					This statement is generated digitally and does not require a physical signature.
+				</p>
+			</div>
+		</div>
+	</div>
+</small>
